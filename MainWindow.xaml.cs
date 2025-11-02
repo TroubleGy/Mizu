@@ -49,14 +49,12 @@ public partial class MainWindow : Window
                 img.Source = bmp;
             }
         }
+        SetIcon(IconLogo, "Mizu.png");
         SetIcon(IconFile, "extension.png");
         SetIcon(IconCode, "code_page.png");
         SetIcon(IconFilter, "filter.png");
         SetIcon(IconFull, "full.png");
         SetIcon(IconClose, "close.png");
-        SetIcon(IconLogo, "Mizu.png");
-        var fadeIn = new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(800));
-        IconLogo.BeginAnimation(OpacityProperty, fadeIn);
     }
 
     void LoadCustomJavaTheme()
@@ -71,7 +69,7 @@ public partial class MainWindow : Window
 
     void OpenJarClick(object s, RoutedEventArgs e)
     {
-        var d = new OpenFileDialog { Filter = "JAR files (*.jar)|*.jar" };
+        var d = new OpenFileDialog { Filter = "JAR files (*.jar)|*.jar" };
         if (d.ShowDialog() == true)
         {
             jarPath = d.FileName;
@@ -104,8 +102,7 @@ public partial class MainWindow : Window
         foreach (var node in OriginalTree)
         {
             var result = FilterTree(node, query);
-            if (result != null)
-                filtered.Add(result);
+            if (result != null) filtered.Add(result);
         }
         foreach (var n in filtered)
             JarTree.Items.Add(n);
@@ -113,19 +110,17 @@ public partial class MainWindow : Window
 
     TreeViewItem? FilterTree(TreeViewItem node, string query)
     {
-        bool found = node.Header.ToString()!.ToLower().Contains(query);
+        bool match = node.Header.ToString()!.ToLower().Contains(query);
         var matches = new List<TreeViewItem>();
         foreach (TreeViewItem child in node.Items)
         {
-            var match = FilterTree(child, query);
-            if (match != null)
-                matches.Add(match);
+            var res = FilterTree(child, query);
+            if (res != null) matches.Add(res);
         }
-        if (found || matches.Count > 0)
+        if (match || matches.Count > 0)
         {
             var clone = new TreeViewItem { Header = node.Header, Tag = node.Tag };
-            foreach (var m in matches)
-                clone.Items.Add(m);
+            foreach (var m in matches) clone.Items.Add(m);
             return clone;
         }
         return null;
@@ -137,9 +132,59 @@ public partial class MainWindow : Window
         if (e.NewValue is not TreeViewItem item) return;
         if (item.Tag is not string entryPath || string.IsNullOrWhiteSpace(entryPath)) return;
 
-        CodeViewer.Text = entryPath.EndsWith(".class")
-            ? JarProcessor.DecompileClass(jarPath, entryPath)
-            : JarProcessor.ReadTextFromJar(jarPath, entryPath);
+        string ext = System.IO.Path.GetExtension(entryPath).ToLower();
+
+        if (ext == ".class")
+        {
+            ShowCode(JarProcessor.DecompileClass(jarPath, entryPath));
+            return;
+        }
+
+        if (JarProcessor.IsImage(entryPath))
+        {
+            var img = JarProcessor.ExtractImage(jarPath, entryPath);
+            if (img != null)
+                ShowImage(img);
+            else
+                ShowCode("// Image could not be loaded");
+            return;
+        }
+
+        if (ext == ".jar")
+        {
+            if (item.Items.Count == 0)
+            {
+                var sub = JarProcessor.ExtractStructureFromInnerJar(jarPath, entryPath);
+                if (sub != null)
+                {
+                    foreach (var node in sub)
+                        item.Items.Add(node);
+                    item.IsExpanded = true;
+                }
+                else
+                {
+                    ShowCode("// Could not open inner JAR");
+                }
+            }
+            return;
+        }
+
+        ShowCode(JarProcessor.ReadTextFromJar(jarPath, entryPath));
+    }
+
+    void ShowCode(string text)
+    {
+        ImageViewer.Visibility = Visibility.Collapsed;
+        CodeViewer.Visibility = Visibility.Visible;
+        CodeViewer.Text = text;
+    }
+
+    void ShowImage(BitmapImage? img)
+    {
+        if (img == null) return;
+        CodeViewer.Visibility = Visibility.Collapsed;
+        ImageViewer.Visibility = Visibility.Visible;
+        ImageViewer.Source = img;
     }
 
     void DragWindow(object s, MouseButtonEventArgs e)
@@ -154,16 +199,13 @@ public partial class MainWindow : Window
         Root.RenderTransformOrigin = new Point(0.5, 0.5);
         Root.RenderTransform = scale;
 
-        var animScale = new DoubleAnimation(targetScale, new Duration(System.TimeSpan.FromMilliseconds(300)))
+        var anim = new DoubleAnimation(targetScale, new Duration(System.TimeSpan.FromMilliseconds(300)))
         {
             EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut },
             AutoReverse = true
         };
-        scale.BeginAnimation(System.Windows.Media.ScaleTransform.ScaleXProperty, animScale);
-        scale.BeginAnimation(System.Windows.Media.ScaleTransform.ScaleYProperty, animScale);
-
-        var fade = new DoubleAnimation(0.9, 1.0, new Duration(System.TimeSpan.FromMilliseconds(200)));
-        Root.BeginAnimation(OpacityProperty, fade);
+        scale.BeginAnimation(System.Windows.Media.ScaleTransform.ScaleXProperty, anim);
+        scale.BeginAnimation(System.Windows.Media.ScaleTransform.ScaleYProperty, anim);
 
         if (maximized)
         {
