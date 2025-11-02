@@ -1,0 +1,285 @@
+﻿<Window x:Class="Mizu.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:avalonedit="http://icsharpcode.net/sharpdevelop/avalonedit"
+        Title="Mizu"
+        Height="720" Width="1280"
+        WindowStyle="None"
+        Background="#0E0E0E"
+        AllowsTransparency="True"
+        ResizeMode="CanResizeWithGrip"
+        Drop="OnDropJar"
+        PreviewDragOver="OnPreviewDragOver"
+        AllowDrop="True">
+
+    <Border x:Name="Root" CornerRadius="14" Background="#101010" BorderBrush="#1E1E1E" BorderThickness="1">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="56"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0" Background="#141414" MouseDown="DragWindow">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="20,0,0,0">
+                    <Image x:Name="IconLogo" Height="32" Width="32" Margin="10,0,0,0" />
+                    
+                    <Button Height="38"
+                            Margin="10"
+                            Padding="12,0"
+                            Background="#24292E"
+                            Foreground="#00BCD4"
+                            FontWeight="Bold"
+                            BorderThickness="0"
+                            Cursor="Hand"
+                            Click="OpenJarClick">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border x:Name="B"
+                                        Background="{TemplateBinding Background}"
+                                        CornerRadius="6">
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="B" Property="Background" Value="#FF2E3A40"/>
+                                    </Trigger>
+                                    <Trigger Property="IsPressed" Value="True">
+                                        <Setter TargetName="B" Property="Background" Value="#FF1C252A"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Image x:Name="IconFile" Width="22" Height="22" Margin="0,0,8,0"/>
+                            <TextBlock Text="Open JAR" VerticalAlignment="Center" FontWeight="Bold"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="1" Margin="0,0,14,0">
+                    <Button x:Name="BtnFull"
+            Width="40" Height="40"
+            Background="Transparent"
+            BorderThickness="0"
+            Cursor="Hand"
+            Click="ToggleMaximize">
+                        <Grid>
+                            <Ellipse x:Name="FullHover"
+                     Fill="Transparent"
+                     Width="40" Height="40"
+                     RenderTransformOrigin="0.5,0.5">
+                                <Ellipse.RenderTransform>
+                                    <ScaleTransform ScaleX="1" ScaleY="1"/>
+                                </Ellipse.RenderTransform>
+                            </Ellipse>
+                            <Image x:Name="IconFull"
+                   Width="18" Height="18"
+                   Stretch="Uniform"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"/>
+                        </Grid>
+                        <Button.Triggers>
+                            <EventTrigger RoutedEvent="MouseEnter">
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ColorAnimation Storyboard.TargetName="FullHover"
+                                        Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)"
+                                        To="#3323A9D6" Duration="0:0:0.2"/>
+                                        <DoubleAnimation Storyboard.TargetName="FullHover"
+                                         Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                                         To="1.1" Duration="0:0:0.2"/>
+                                        <DoubleAnimation Storyboard.TargetName="FullHover"
+                                         Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                                         To="1.1" Duration="0:0:0.2"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                            <EventTrigger RoutedEvent="MouseLeave">
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ColorAnimation Storyboard.TargetName="FullHover"
+                                        Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)"
+                                        To="#00000000" Duration="0:0:0.2"/>
+                                        <DoubleAnimation Storyboard.TargetName="FullHover"
+                                         Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                                         To="1" Duration="0:0:0.2"/>
+                                        <DoubleAnimation Storyboard.TargetName="FullHover"
+                                         Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                                         To="1" Duration="0:0:0.2"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                        </Button.Triggers>
+                    </Button>
+
+                    <Button x:Name="BtnClose"
+            Width="40" Height="40"
+            Background="Transparent"
+            BorderThickness="0"
+            Cursor="Hand"
+            Click="CloseApp">
+                        <Grid>
+                            <Ellipse x:Name="CloseHover"
+                     Fill="Transparent"
+                     Width="40" Height="40"
+                     RenderTransformOrigin="0.5,0.5">
+                                <Ellipse.RenderTransform>
+                                    <ScaleTransform ScaleX="1" ScaleY="1"/>
+                                </Ellipse.RenderTransform>
+                            </Ellipse>
+                            <Image x:Name="IconClose"
+                   Width="18" Height="18"
+                   Stretch="Uniform"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"/>
+                        </Grid>
+                        <Button.Triggers>
+                            <EventTrigger RoutedEvent="MouseEnter">
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ColorAnimation Storyboard.TargetName="CloseHover"
+                                        Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)"
+                                        To="#33FF5555" Duration="0:0:0.2"/>
+                                        <DoubleAnimation Storyboard.TargetName="CloseHover"
+                                         Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                                         To="1.1" Duration="0:0:0.2"/>
+                                        <DoubleAnimation Storyboard.TargetName="CloseHover"
+                                         Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                                         To="1.1" Duration="0:0:0.2"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                            <EventTrigger RoutedEvent="MouseLeave">
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ColorAnimation Storyboard.TargetName="CloseHover"
+                                        Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)"
+                                        To="#00000000" Duration="0:0:0.2"/>
+                                        <DoubleAnimation Storyboard.TargetName="CloseHover"
+                                         Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                                         To="1" Duration="0:0:0.2"/>
+                                        <DoubleAnimation Storyboard.TargetName="CloseHover"
+                                         Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                                         To="1" Duration="0:0:0.2"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                        </Button.Triggers>
+                    </Button>
+                </StackPanel>
+            </Grid>
+
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="320"/>
+                    <ColumnDefinition Width="4"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0"
+                        CornerRadius="12"
+                        Margin="10,8,0,8"
+                        Background="#181818"
+                        BorderBrush="#202020"
+                        BorderThickness="1">
+                    <StackPanel Margin="6" Background="#181818">
+                        <Grid Margin="0,0,0,4">
+                            <TextBox x:Name="FilterBox"
+                                     Height="28"
+                                     Padding="6,0,30,0" 
+                                     Background="#1F1F1F"
+                                     Foreground="#00BCD4"
+                                     BorderThickness="1"
+                                     BorderBrush="#2C2C2C"
+                                     FontFamily="Cascadia Code"
+                                     FontSize="13"
+                                     VerticalContentAlignment="Center"
+                                     TextChanged="FilterBox_TextChanged"/>
+                            <Image x:Name="IconFilter"
+                                   Height="16"
+                                   Width="16"
+                                   HorizontalAlignment="Right"
+                                   VerticalAlignment="Center"
+                                   Margin="0,0,8,0"
+                                   IsHitTestVisible="False"/>
+                        </Grid>
+
+                        <TreeView x:Name="JarTree"
+                                  Background="#181818"
+                                  BorderThickness="0"
+                                  ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                  ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                                  Foreground="#E9EEF2"
+                                  FontFamily="Cascadia Code"
+                                  FontSize="13"
+                                  SelectedItemChanged="JarTree_SelectedItemChanged">
+                            <TreeView.Resources>
+                                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#00BCD4"/>
+                                <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="#181818"/>
+                                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="#FFFFFF"/>
+                                <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="#181818"/>
+                                <Style TargetType="TreeViewItem">
+                                    <Setter Property="Foreground" Value="#E9EEF2"/>
+                                    <Setter Property="Background" Value="Transparent"/>
+                                    <Setter Property="BorderThickness" Value="0"/>
+                                    <Setter Property="FontSize" Value="13"/>
+                                    <Setter Property="Padding" Value="2,1,2,1"/>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter Property="Background" Value="#00BCD4"/>
+                                            <Setter Property="Foreground" Value="#000000"/>
+                                        </Trigger>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="#292929"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TreeView.Resources>
+                        </TreeView>
+                    </StackPanel>
+                </Border>
+
+                <Rectangle Grid.Column="1" Fill="#1E1E1E" RadiusX="2" RadiusY="2"/>
+
+                <Border Grid.Column="2"
+                        Margin="4,8,10,8"
+                        Background="#181818"
+                        CornerRadius="12"
+                        BorderBrush="#202020"
+                        BorderThickness="1">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="46"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="18,0,0,0">
+                            <Image x:Name="IconCode" Height="26" Width="26" Margin="0,0,8,0"/>
+                            <TextBlock Text="Java Code View"
+                                       VerticalAlignment="Center"
+                                       Foreground="#00BCD4"
+                                       FontWeight="Bold"
+                                       FontSize="15"/>
+                        </StackPanel>
+                        <avalonedit:TextEditor Grid.Row="1"
+                                               x:Name="CodeViewer"
+                                               ShowLineNumbers="True"
+                                               IsReadOnly="True"
+                                               FontSize="14"
+                                               FontFamily="Cascadia Mono"
+                                               Foreground="#D7FBFF"
+                                               Background="#181818"
+                                               TextOptions.TextFormattingMode="Display"
+                                               LineNumbersForeground="#00AEEA"
+                                               BorderThickness="0"
+                                               HorizontalScrollBarVisibility="Auto"
+                                               VerticalScrollBarVisibility="Auto"/>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>

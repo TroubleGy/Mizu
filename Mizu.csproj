@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net8.0-windows</TargetFramework>
+		<UseWPF>true</UseWPF>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<ApplicationIcon>Mizu.ico</ApplicationIcon>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <Content Include="Mizu.ico" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="AvalonEdit" Version="6.3.1.120" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="external\cfr.jar">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+			<TargetPath>assets\external\cfr.jar</TargetPath>
+		</None>
+			<None Update="external\icons\*.png">
+				<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+				<TargetPath>assets\external\icons\%(Filename)%(Extension)</TargetPath>
+			</None>
+		<None Update="external\themes\MizuJava.xshd">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+			<TargetPath>assets\external\themes\MizuJava.xshd</TargetPath>
+		</None>
+	</ItemGroup>
+
+</Project>
